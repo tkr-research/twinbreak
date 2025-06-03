@@ -28,7 +28,6 @@ class ExperimentExecutor:
         print(f'Creating output folders...')
         self.folder_main = FileHandler.ensure_dir_exists(self.experiment_config.output_folder)
         self.folder_log = FileHandler.ensure_dir_exists(self.folder_main, 'log')
-        self.folder_data = FileHandler.ensure_dir_exists(self.folder_main, 'data')
         print(f'Creating output folders done.')
 
     def __initialize_logger(self) -> None:
