@@ -261,9 +261,6 @@ To ensure reproducibility and consistent package management, we use _Miniconda_ 
 it is possible to install the dependencies globally without Miniconda, we recommend using Miniconda as described below.
 If Miniconda is skipped, users must manually install Python 3.10 and ensure all dependencies are correctly resolved.
 
-💡 Hint:  When copying multi-line commands from the README file, we recommend first pasting them into a plain text
-editor (e.g., Notepad) to remove any unintended line breaks before executing them in the terminal.
-
 ### Hugging Face Token
 
 If you already have access to a Hugging Face access token with read permissions, you can use it directly. Otherwise,
