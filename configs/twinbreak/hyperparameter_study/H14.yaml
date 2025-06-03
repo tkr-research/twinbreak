@@ -1,0 +1,55 @@
+# Whether to identify and exclude utility neurons when pruning
+exclude_utility_nodes: true
+
+# The rate of top utility parameters to be excluded from pruning
+utility_parameter_rate: 0.001
+
+# Range of decoder block layers that undergo pruning. Format int_int.
+target_layers: 1_-1
+
+# Which MLP components should be pruned. See TargetModuleConfig for values.
+target_modules:
+  - gate
+  - up
+
+# Which input tokens are considered when taking mean over the token activations to find safety critical neurons. See TargetInputTokenConfig for values.
+target_input_tokens: after_inst
+
+# If target_input_tokens is custom this value specifies the last n positions of the input tokens whose activations are considered
+target_input_tokens_custom_pos: -6
+
+# The number of output tokens to generate (N). The number of output tokens to consider when identifying safety critical neurons will be N - 1.
+n_out_tokens_to_collect: 1
+
+# If we take the mean over all or only the top_n_critical tokens. See TokenMeanConfig for values.
+mean_over_tokens: critical
+
+# Number of tokens with the largest L2 norm activations considered for averaging
+top_n_critical: 5
+
+# How many output tokens to generate under pruned model
+n_out_tokens_to_apply_pruning: 100
+
+# Whether to aggregate pruned parameters during pruning iterations
+aggregate_pruning: true
+
+# Number of pruning iterations
+pruning_iterations: 5
+
+# In what batches do we compute the safety parameters. See BatchModeConfig for values.
+batch_mode: none
+
+# Batch size for safety parameter identification (required if batch_mode is not NONE)
+batch_mode_batch_size: 0
+
+# Initial rate of top safety critical neurons to be pruned
+initial_parameter_pruning_rate: 0.01
+
+# The rate of top safety critical neurons to be pruned in iterations > 1
+parameter_pruning_step: 0.01
+
+# We always use the twinprompt dataset
+dataset_identifier: twinprompt
+
+# Indicates if we use the complete training dataset or not. TwinPrompt contains 100 samples
+training_size: 100

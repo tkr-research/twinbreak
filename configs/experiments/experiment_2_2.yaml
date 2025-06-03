@@ -1,0 +1,29 @@
+# A string for a model. See ModelIdentifier enum for values.
+model_identifier: "gemma2_9b"
+
+# How many data are fed during inference to your GPU. Adjust based on your GPU memory size.
+batch_size: 20
+
+# The precision of the LLM. See PrecisionConfig enum for values.
+precision: "bit16"
+
+# List of all harmful datasets used for safety evaluation. See DatasetIdentifier enum for values.
+safety_evaluation_datasets:
+  - "harmbench_validation"
+  - "advbench"
+  - "jailbreakbench"
+  - "strongreject"
+
+# List of all utility datasets or benchmarks used for utility evaluation. See UtilityDatasetIdentifier enum for values.
+utility_evaluation_datasets:
+  - "hellaswag"
+  - "rte"
+  - "openbookqa"
+  - "arc_challenge"
+  - "winogrande"
+
+# File path to the JSON config file for TwinBreak relative to the ExperimentConfig file.
+twinbreak_config_file_path: "../twinbreak/twinbreak_default_settings.yaml"
+
+# The seed for the randomness, see RandomHandler.
+seed: 42
