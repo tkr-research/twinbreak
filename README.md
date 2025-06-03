@@ -10,7 +10,7 @@ To reference this work, the following citations should be used.
 ### Plain Text
 
 ```
-Krauß, T., Dashtbani, H., & Dmitrienko, A. (2025). TwinBreak: Jailbreaking LLM Security Alignments based on Twin Prompts. 34rd USENIX Security Symposium (USENIX Security 25).
+Krauß, T., Dashtbani, H., & Dmitrienko, A. (2025). TwinBreak: Jailbreaking LLM Security Alignments based on Twin Prompts. 34th USENIX Security Symposium (USENIX Security 25).
 ```
 
 ### BibTeX
