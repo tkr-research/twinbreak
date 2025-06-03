@@ -292,11 +292,11 @@ bash Miniconda3-latest-Linux-x86_64.sh
 
 During installation, follow these steps:
 
-- Press _ENTER} to view the license terms.
-- Press _SPACE} to scroll to the end of the license terms.
-- Type _yes} to accept the license agreement.
-- Press _ENTER} to confirm the default location for conda environments.
-- Type _yes} to enable automatic activation of conda on shell startup.
+- Press _ENTER_ to view the license terms.
+- Press _SPACE_ to scroll to the end of the license terms.
+- Type _yes_ to accept the license agreement.
+- Press _ENTER_ to confirm the default location for conda environments.
+- Type _yes_ to enable automatic activation of conda on shell startup.
 
 Afterward, restart your shell, such that conda is activated. The shell should look like this showing that the base conda
 environment is activated:
@@ -505,7 +505,7 @@ the [screen manual page](https://wiki.ubuntuusers.de/Screen/). However, this ste
       The output can be compared to the utility and safety benchmarks in Tables 15–19 and Tables 2–5, respectively.
     - 💡 Hint: As before, we expect the reported values to be within a 1–5\% range of those presented in the paper.
 
-- __E2__: _E3: _Model Size Independence_ [2 human-minute + 4 compute-hour + 75GB disk]: In this experiment we attack
+- __E3__: _Model Size Independence_ [2 human-minute + 4 compute-hour + 75GB disk]: In this experiment we attack
   models with different model sizes, namely LLaMA 2 (13b) and Qwen 2.5 (3b), using TwinBreak. We evaluate the jailbreak
   success with the newest benchmark (StrongREJECT) and the utility with HellaSwag. The results prove the major claim (
   C3).
