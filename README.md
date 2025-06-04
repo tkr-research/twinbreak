@@ -148,14 +148,16 @@ We also recommend using a Conda environment for managing dependencies, which con
 - NVIDIA GPU with at least 48 GB of memory
 - 130 GB of available disk space
 
-💡 Hint 1: Reproducing the full experimental suite from the paper, including models with up to 70 billion
+💡 _Hint 1_: Reproducing the full experimental suite from the paper, including models with up to 70 billion
 parameters, demands significantly more resources, both GPU memory and disk space. For reference, our experimental setup
 used an Intel Xeon Gold 6526Y CPU (16 cores, 64 threads), 256 GB of RAM, four NVIDIA L40S GPUs (each with 48 GB of GDDR6
-memory), and a 7 TB HDD. Scripts related to these large-scale experiments are included for completeness but are not
-required to run the artifact’s core demonstration. Users may safely skip them if constrained by hardware.
+memory), and a 7 TB HDD. Configurations to these large-scale experiments are included for completeness but are not
+part of the prepared demonstration. Users may select the respective model architectures in the configuration file to
+execute them.
 
-💡 Hint 2: The most memory-intensive aspect of the artifact is the generation of LLM responses during
-utility and safety evaluations, not the TwinBreak attack itself. By default, a batch size of 20 is used. To reduce
+💡 _Hint 2_: The most memory-intensive aspect of the artifact is the generation of LLM responses during
+utility and safety evaluations, not the TwinBreak attack itself. By default, a batch size of 20 is used for inference
+during benchmark executions. To reduce
 runtime, this can be increased up to 100, provided sufficient GPU memory is available. If the available GPU memory is
 less than 48 GB, the batch size may need to be reduced to fit the model, though this will come at the cost of longer
 runtimes.
@@ -180,7 +182,7 @@ packages can be installed via the [pip package manager](https://pip.pypa.io/en/s
 - python-dotenv 0.9.9
 - pyyaml 6.0.2
 
-💡 Hint: We provide specific package versions to ensure a smooth and consistent reproduction process. In
+💡 _Hint_: We provide specific package versions to ensure a smooth and consistent reproduction process. In
 particular, newer versions of _transformers_ may lead to issues related to _torch.\_dynamo_, which
 attempts to compile Python model code into a single optimized computation graph. If the model's code involves frequent
 changes in shape, type, or control flow, such as from dynamic _forward()_ logic or the use of hooks, Dynamo may
@@ -188,7 +190,7 @@ recompile the graph repeatedly, eventually reaching the default limit of 8 recom
 pruning implementation, which relies on forward hooks. While it is possible to circumvent the problem by disabling
 TorchDynamo Just-In-Time (JIT) Compilation using the _TORCHDYNAMO\_DISABLE=1_ environment flag, doing so can
 significantly increase execution time. Therefore, we recommend using the package versions and settings specified in the
-paper.
+paper. In the future, alternative pruning methods can be implemented to tackle this problem.
 
 ### Hugging Face Access
 
@@ -209,32 +211,16 @@ respective Hugging Face website and subsequent access token authorization:
 - https://huggingface.co/meta-llama/Llama-Guard-3-8B
 - https://huggingface.co/google/gemma-2b
 
+Executing experiments with additional models may require accepting further license agreements.
+
 ## 📁 Datasets
 
-The artifact contains three dataset categories: one for assessing safety alignment, another for measuring utility, and
+The project contains three dataset categories: one for measuring utility, another for assessing safety alignment, and
 the newly introduced TwinPrompt dataset used during the TwinBreak attack.
-
-### Safety Alignment Benchmarks
-
-The artifact uses four datasets comprising harmful prompts to assess LLMs' security and resilience against potential
-misuse.
-These prompts are designed to mimic malicious interactions.
-All datasets are open-source and are already part of the repository formatted as JSON files.
-The four datasets and respective links to the original dataset files are:
-
-1) [AdvBench](https://github.com/llm-attacks/llm-attacks/blob/main/data/advbench/harmful_behaviors.csv), which contains
-   520 harmful prompts.
-2) [HarmBench](https://github.com/centerforaisafety/HarmBench/blob/main/data/behavior_datasets/harmbench_behaviors_text_all.csv),
-   an improved version of AdvBench with 400 harmful prompts. Following related work (as discussed in the paper), we only
-   use 200 prompts from HarmBench.
-3) [JailbreakBench](https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors), which
-   contains 100 pairs of harmful and harmless prompts. However, the pairs are not twins as in our dataset.
-4) [StrongREJECT](https://raw.githubusercontent.com/alexandrasouly/strongreject/main/strongreject_dataset/strongreject_dataset.csv),
-   which contains 313 harmful prompts trying to address shortcomings of the previous datasets.
 
 ### Utility Benchmarks
 
-We use five dataset to utility analysis. All datasets can be easily downloaded and
+The project uses five dataset to utility analysis. All datasets can be easily downloaded and
 are open-source. The five datasets are:
 
 1) OpenBookQA, which tests an LLM's reasoning and knowledge absorption
@@ -247,18 +233,41 @@ are open-source. The five datasets are:
 
 The datasets are downloaded and used on the fly via the [lm\_eval Python package](https://pypi.org/project/lm-eval/).
 
+### Safety Alignment Benchmarks
+
+The project uses four datasets comprising harmful prompts to assess LLMs' security and resilience against potential
+misuse. These prompts are designed to mimic malicious interactions.
+All datasets are open-source and are already part of the repository formatted as JSON files.
+The four datasets and respective links to the original dataset files are:
+
+1) [AdvBench](./dataset/json/advbench.json) ([raw](https://github.com/llm-attacks/llm-attacks/blob/main/data/advbench/harmful_behaviors.csv)),
+   which contains
+   520 harmful prompts.
+2) [HarmBench](./dataset/json/harmbench_validation.json) ([raw](https://github.com/centerforaisafety/HarmBench/blob/main/data/behavior_datasets/harmbench_behaviors_text_all.csv)),
+   an improved version of AdvBench with 400 harmful prompts. Following related work (as discussed in the paper), we only
+   use 200 prompts from HarmBench.
+3) [JailbreakBench](./dataset/json/jailbreakbench.json) ([raw](https://huggingface.co/datasets/JailbreakBench/JBB-Behaviors)),
+   which
+   contains 100 pairs of harmful and harmless prompts. However, the pairs are not twins as in our dataset.
+4) [StrongREJECT](./dataset/json/strongreject.json) ([raw](https://raw.githubusercontent.com/alexandrasouly/strongreject/main/strongreject_dataset/strongreject_dataset.csv)),
+   which contains 313 harmful prompts trying to address shortcomings of the previous datasets.
+
 ### TwinPrompt Dataset
 
-Finally, we publish our new dataset, TwinPrompt, which consists of one hundred
-prompt pairs with one harmful and one harmless prompt that yield high structural and content similarity. The dataset is
-also part of this repository and in JSON format and can be found under _twinbreak/dataset/json/twinprompt.json_.
+Finally, this repository publishes the new dataset, [TwinPrompt](./dataset/json/twinprompt.json), which consists of one
+hundred
+prompt pairs with one harmful and one harmless prompt that yield high structural and content similarity.
+The [dataset](./dataset/json/twinprompt.json) is
+also part of this repository and in JSON format.
 
 ## 🚀 Getting Started
 
 It is assumed that the setup begins with a newly created user account on a Unix-based server, such as a Debian system.
 
-To ensure reproducibility and consistent package management, we use _Miniconda_ to manage the Python environment. While
-it is possible to install the dependencies globally without Miniconda, we recommend using Miniconda as described below.
+To ensure reproducibility and consistent package management, we
+use [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/main) to manage the Python environment.
+While it is possible to install the dependencies globally without Miniconda, we recommend using Miniconda as described
+below.
 If Miniconda is skipped, users must manually install Python 3.10 and ensure all dependencies are correctly resolved.
 
 ### Hugging Face Token
@@ -267,7 +276,7 @@ If you already have access to a Hugging Face access token with read permissions,
 follow the steps below to create your own token:
 
 - Create an [Hugging Face](https://huggingface.co/) account. Such an account can be created for free.
-- To generate an access token, visit https://huggingface.co/settings/tokens}{https://huggingface.co/settings/tokens,
+- To generate an access token, visit [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens),
   click ''Create new token'', select the ''Read'' token type, and assign a name to the token. Once created, copy the
   token for later use.
 - To get access to the models, please follow the license agreement instructions provided on the Hugging Face links
@@ -276,7 +285,8 @@ follow the steps below to create your own token:
 
 ### Miniconda Installation
 
-If Miniconda or Anaconda is not already installed on the server, follow the steps below to install Miniconda.
+If [Miniconda](https://www.anaconda.com/docs/getting-started/miniconda/main) is not already installed on the
+server, follow the steps below to install Miniconda.
 
 1) Download the Miniconda installer:
 
@@ -323,7 +333,6 @@ Afterward, your shell should look like this, showing that the new twinbreak envi
 
 ```text
 (twinbreak) user@server:/home/user$
-
   ```
 
 2) Identify your CUDA version (if applicable):
@@ -376,7 +385,8 @@ git clone https://github.com/tkr-research/twinbreak.git
 cd twinbreak
   ```
 
-3) Run the setup script, providing your Hugging Face access token and the model storage path. Therefore, replace
+3) Run the [setup.sh](./setup.sh) script, providing your Hugging Face access token and the model storage path.
+   Therefore, replace
    _<HUGGING\_FACE\_TOKEN>_ and _<STORE\_MODEL\_DISK\_PATH>_ with the real values, e.g.,
    _hf\_xxxYOURTOKENxxx_ and _\home\user\.cache\huggingface_. Note, that the terminal user needs read and write
    permissions to the selected directory. The two values
@@ -410,7 +420,7 @@ cd experiments
 2) Execute the test script to verify the setup:
 
   ```bash
-python -u experiment_test.py
+python experiment_test.py
   ```
 
 3) If successful, the following message will be displayed:
@@ -425,45 +435,50 @@ The system is set up to run experiments!
 
 - __C1__: TwinBreak effectively removes safety alignment from open-source large language models (LLMs) with minimal
   impact on their utility, as demonstrated on the LLaMA 2 (7B) model. This is proven by experiment (E1) in this
-  artifact, which is also reported in Section 4.2 of the paper, with results reported in the first rows of Tables 2–5
+  project, which is also reported in Section 4.2 of the paper, with results reported in the first rows of Tables 2–5
   for safety alignment removal, and Tables 15–19 for utility preservation.
 
 - __C2__: TwinBreak demonstrates effectiveness across diverse model architectures and vendors, as shown on Llama 3.1 (
-  8B), Gemma 2 (9B), and Qwen 2.5 (7B). This is proven by experiment (E2) in this artifact, which is also reported in
+  8B), Gemma 2 (9B), and Qwen 2.5 (7B). This is proven by experiment (E2) in this project, which is also reported in
   Section 4.2 of the paper, with results reported in the remaining rows of Tables 2–5 for safety alignment removal, and
   Tables 15–19 for utility preservation.
 
 - __C3__: TwinBreak also proves effective across varying model sizes, as demonstrated on the larger LLaMA 2 (13B) and
-  the smaller Qwen 2.5 (3B). This is proven by experiment (E3) in this artifact, which is also reported in Section 4.6
+  the smaller Qwen 2.5 (3B). This is proven by experiment (E3) in this project, which is also reported in Section 4.6
   of the paper, with results reported in rows two and six of Table 8.
 
 ### Experiments
 
-The reported experiment runtimes were obtained using a single NVIDIA L40s GPU with 48 GB of memory.
+💡 _Hint 1_: The reported experiment runtimes were obtained using a single NVIDIA L40s GPU with 48 GB of memory.
 Actual runtimes may vary depending on the number of GPUs, GPU model, and available memory.
 By default, the provided code will automatically utilize all available GPUs on the server.
 
-If you wish to restrict execution to a specific subset of GPUs, you will need to modify the command used to run the
+💡 _Hint 2_: If you wish to restrict execution to a specific subset of GPUs, you will need to modify the command used to
+run the
 Python scripts.
 For example, to use only the GPUs with indices 1 and 2, the command would be:
 
 ```bash
- CUDA_VISIBLE_DEVICES=1,2 python -u experiment_test.py
+ CUDA_VISIBLE_DEVICES=1,2 python experiment_test.py
 ```
 
-Given the potentially long runtime of the experiments, we recommend using the _screen_ tool to prevent interruptions in
+💡 _Hint 3_: Given the potentially long runtime of the experiments, we recommend using the _screen_ tool to prevent
+interruptions in
 case the connection to the server is lost. This helps ensure that experiments continue running even if the terminal
 session is disconnected. For usage instructions, please refer to
 the [screen manual page](https://wiki.ubuntuusers.de/Screen/). However, this step is optional for executing the project.
 
+Below, three experiments are described, each proving one major claim of this project.
+
 - __E1__: _General Functionality_ [1 human-minute + 2 compute-hour + 35GB disk]: In this experiment, we attack the LLaMA
   2 (7B) model with TwinBreak and evaluate the jailbreak success as well as the utility with all benchmarks. The results
   prove the major claim (C1).
-    - Preparation: Follow all instructions under the _Getting Started_ section. The terminal should reside in the
+    - Preparation: Follow all instructions under the [Getting Started](#-getting-started) section. The terminal should
+      reside in the
       _twinbreak\experiments_ folder.
-    - Execution: Execute the script for the first experiment.
+    - Execution: Execute the [experiment_1.py](./experiments/experiment_1.py) script for the first experiment.
       ```bash
-      python -u experiment_1.py
+      python experiment_1.py
       ```
     - Results: The experiment logs its results both to the terminal and to a log file located at
       _twinbreak\results\experiment\_1\log\log0.txt_. At the end of the output, a summary of the results is presented in
@@ -481,27 +496,28 @@ the [screen manual page](https://wiki.ubuntuusers.de/Screen/). However, this ste
   repeat
   experiment (E1) with different model architectures from different vendors, namely Llama 3.1 (8B), Gemma 2 (9B), and
   Qwen 2.5 (7B). The results prove the major claim (C2).
-    - Preparation: Follow all instructions under _Getting Started_ section. The terminal should reside in the
+    - Preparation: Follow all instructions under [Getting Started](#-getting-started) section. The terminal should
+      reside in the
       _twinbreak\experiments} folder.
     - Execution: We provide one script for each of the models. Execute the scripts individually.
-        - To execute TwinBreak for Qwen 2.5 (7b), execute the following
-          command. [1 human-minute + 2 compute-hour + 37GB disk]
+        - To execute TwinBreak for Qwen 2.5 (7b), run the [experiment_2_1.py](./experiments/experiment_2_1.py)
+          script. [1 human-minute + 2 compute-hour + 37GB disk]
             ```bash
-             python -u experiment_2_1.py
+             python experiment_2_1.py
             ```
-        - To execute TwinBreak for Gemma 2 (9b), execute the following
-          command. [1 human-minute + 3 compute-hour + 40GB disk]
+        - To execute TwinBreak for Gemma 2 (9b), run the [experiment_2_2.py](./experiments/experiment_2_2.py)
+          script. [1 human-minute + 3 compute-hour + 40GB disk]
             ```bash
-             python -u experiment_2_2.py
+             python experiment_2_2.py
             ```
-        - To execute TwinBreak for LLaMA 3.1 (8b), execute the following
-          command. [1 human-minute + 2 compute-hour + 37GB disk]
+        - To execute TwinBreak for LLaMA 3.1 (8b), run the [experiment_2_3.py](./experiments/experiment_2_3.py)
+          script. [1 human-minute + 2 compute-hour + 37GB disk]
             ```bash
-             python -u experiment_2_3.py
+             python experiment_2_3.py
             ```
     - Results: As with experiment (E1), each script generates terminal output and corresponding log files stored in the
       appropriate results folder, for example,
-      _twinbreak\results\experiment\_2\_1\log\log0.txt_ for _experiment\_2\_1.py_.
+      _twinbreak\results\experiment\_2\_1\log\log0.txt_ for [experiment_2_1.py](./experiments/experiment_2_1.py).
       The output can be compared to the utility and safety benchmarks in Tables 15–19 and Tables 2–5, respectively.
     - 💡 Hint: As before, we expect the reported values to be within a 1–5\% range of those presented in the paper.
 
@@ -509,22 +525,25 @@ the [screen manual page](https://wiki.ubuntuusers.de/Screen/). However, this ste
   models with different model sizes, namely LLaMA 2 (13b) and Qwen 2.5 (3b), using TwinBreak. We evaluate the jailbreak
   success with the newest benchmark (StrongREJECT) and the utility with HellaSwag. The results prove the major claim (
   C3).
-    - Preparation: Preparation: Follow all instructions under _Getting Started_ section. The terminal should reside in
+    - Preparation: Preparation: Follow all instructions under [Getting Started](#-getting-started) section. The
+      terminal
+      should reside in
       the _twinbreak\experiments_ folder.
     - Execution: We provide one script for each of the models. Execute the scripts individually.
-        - To execute TwinBreak for LLaMA 2 (13b), execute the following
-          command. [1 human-minute + 3 compute-hour + 47GB disk]
+        - To execute TwinBreak for LLaMA 2 (13b), run the [experiment_3_1.py](./experiments/experiment_3_1.py)
+          script. [1 human-minute + 3 compute-hour + 47GB disk]
             ```bash
-             python -u experiment_3_1.py
+             python experiment_3_1.py
             ```
-        - To execute TwinBreak for Qwen 2.5 (3b), execute the following
-          command. [1 human-minute + 1 compute-hour + 28GB disk]
+        - To execute TwinBreak for Qwen 2.5 (3b), run the [experiment_3_2.py](./experiments/experiment_3_2.py)
+          script. [1 human-minute + 1 compute-hour + 28GB disk]
             ```bash
-             python -u experiment_3_2.py
+             python experiment_3_2.py
             ```
     - Results: As with experiment (E1), each script generates terminal output and corresponding log files stored in the
       appropriate results folder, for example,
-      _twinbreak\results\experiment\_3\_1\log\log0.txt_ for _experiment\_3\_1.py_. The output can be compared to the
+      _twinbreak\results\experiment\_3\_1\log\log0.txt_ for [experiment_3_1.py](./experiments/experiment_3_1.py). The
+      output can be compared to the
       utility and safety benchmark results in Table 8. Specifically, the _AVG Degradation_ value in the utility
       benchmarks corresponds to the _TwinBreak Utility_ column for the respective model in Table 8, while the
       StrongREJECT score in the _Iteration 5_ column reflects the _TwinBreak ASR_ column in Table 8.
@@ -533,13 +552,111 @@ the [screen manual page](https://wiki.ubuntuusers.de/Screen/). However, this ste
 
 ## ♻️ Reusability
 
-To evaluate _TwinBreak_ with different models or alternative hyperparameters, the file _experiment\_default.py_ in the
-_experiments_ folder can be duplicated and modified accordingly.
-Corresponding configuration files can be generated by copying and adjusting _experiment\_default\_settings.yaml_ and
-_twinbreak\_default\_settings.yaml_.
+### Core Functionality
 
-The configuration files used for the hyperparameter study (corresponding to Table 20 in the paper) are provided in
-_twinbreak/configs/twinbreak/hyperparameter\_study_.
+The core functionality of *TwinBreak* is implemented in [`TwinBreak.py`](./twinbreak/TwinBreak.py). Configuration
+options and
+hyperparameters are managed via YAML files, with [
+`twinbreak_default_settings.yaml`](./configs/twinbreak/twinbreak_default_settings.yaml) serving as the default
+configuration. Each parameter is documented in the paper, the YAML file itself, and the corresponding Python class [
+`TwinBreakConfig.py`](./configs/twinbreak/TwinBreakConfig.py).
 
-To apply _TwinBreak_ to new models that are not yet supported, a new subclass of the _AbstractModel_ class should be
-implemented in _twinbreak/models_.
+To evaluate TwinBreak on benchmark tasks, use the [`TwinBreakAndEval.py`](./configs/twinbreak/TwinBreakAndEval.py)
+wrapper, which extends the core functionality of [`TwinBreak.py`](./twinbreak/TwinBreak.py) with evaluation
+capabilities.
+
+### Customizing Experiments
+
+There are two main types of configuration files:
+
+- **TwinBreak configuration** (e.g., utility weight parameters):  
+  Default: [`twinbreak_default_settings.yaml`](./configs/twinbreak/twinbreak_default_settings.yaml)
+
+- **Experiment configuration** (e.g., selected model, benchmarks, batch size):  
+  Default: [`experiment_default_settings.yaml`](./configs/experiments/experiment_default_settings.yaml)
+
+The entry point for running a complete experiment is [`ExperimentExecutor.py`](./experiments/ExperimentExecutor.py),
+which provides a `run()` function to execute the pipeline.
+
+### Hyperparameter Study
+
+Configuration files used for the hyperparameter analysis (as reported in Table 20 of the paper) are available in the
+hyperparameter_study folder with [H1.yaml](./configs/twinbreak/hyperparameter_study/H1.yaml) being the first file.
+
+### Extending to New Models
+
+To apply _TwinBreak_ to models not currently supported, implement a new subclass of
+the [AbstractModel.py](./models/AbstractModel.py) class. Then, reference your custom model identifier in the experiment
+configuration file.
+
+## 🧹 Cleanup Instructions
+
+After regular usage of this project, you may wish to clean up your environment. The following steps will guide you
+through the cleanup process:
+
+### 1. Delete Downloaded Models
+
+Remove the models stored on disk by deleting the folder specified as the `--store-model-disk-path` when running the [
+`setup.sh`](./setup.sh) script.
+
+### 2. Remove Code and Results
+
+Delete the root folder of the project. Experimental results are saved inside a `results/` folder under this root
+directory.
+
+### 3. Remove the Conda Environment
+
+If you created a dedicated Conda environment named `twinbreak`, remove it using:
+
+```bash
+conda env remove --name twinbreak
+```
+
+### 4. (Optional) Remove Miniconda Itself
+
+If you no longer need Miniconda, delete its installation directory. This is typically:
+
+```bash
+rm -rf ~/miniconda3
+```
+
+> 🔁 Replace the path if Miniconda was installed elsewhere.
+
+Also remove Conda initialization from your shell configuration:
+
+```bash
+nano ~/.bashrc
+```
+
+Then delete the block that looks like this:
+
+```bash
+# >>> conda initialize >>>
+__conda_setup="$('/home/youruser/miniconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+...
+# <<< conda initialize <<<
+```
+
+Save the file and reload your shell:
+
+```bash
+source ~/.bashrc
+```
+
+### 5. Delete Leftover Configuration Files
+
+Optionally, remove cached and config directories:
+
+```bash
+rm -rf ~/.conda ~/.continuum
+```
+
+### 6. Verify Removal
+
+Check that `conda` is no longer available:
+
+```bash
+which conda
+```
+
+If the command returns nothing or `command not found`, Conda has been fully removed.
