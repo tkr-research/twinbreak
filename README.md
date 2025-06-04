@@ -647,6 +647,10 @@ source ~/.bashrc
 
 Optionally, remove cached and config directories:
 
+💡 _Hint_: The _.continuum_ directory is a hidden folder in your home directory created by Miniconda. It is primarily
+used to store user-specific settings and cache data related to the graphical tools and libraries developed by Continuum
+Analytics (the original creators of Anaconda).
+
 ```bash
 rm -rf ~/.conda ~/.continuum
 ```
